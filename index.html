@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva de Películas en Cine</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #edc9f7;
+        }
+
+        header {
+            background-color: #333;
+            color: rgb(253, 252, 252);
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        main {
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        form {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgb(247, 248, 247);
+            padding: 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        #imagenPelicula {
+            text-align: center;
+            margin-top: 1rem;
+            
+        }
+
+        #imagenSeleccionada {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #1f1c1c;
+            border-radius: 5px;
+            padding: 0.5rem;
+        }
+
+        #resultado {
+            max-width: 600px;
+            width: 100%;
+            margin: 2rem auto;
+            text-align: center;
+            background: white;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #resultado h2 {
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Reserva tu Boleto</h1>
+    </header>
+
+    <main>
+        <form id="reservaForm">
+            <h4>Elige tu película</h4>
+
+            <label for="categoria">Categoría:</label>
+            <select id="categoria" name="categoria">
+                <option value="">Selecciona una categoría</option>
+                <option value="terror">Terror</option>
+                <option value="accion">Acción</option>
+                <option value="comedia">Comedia</option>
+                <option value="romance">Romance</option>
+            </select>
+
+            <label for="pelicula">Películas Disponibles:</label>
+            <select id="pelicula" name="pelicula">
+                <option value="">Selecciona una película</option>
+            </select>
+
+            <div id="imagenPelicula">
+                <img src="" alt="Imagen de la película" id="imagenSeleccionada">
+            </div>
+
+            <label for="cantidad">Cantidad de boletos:</label>
+            <input type="number" id="cantidad" name="cantidad" min="1" required>
+
+            <label for="precio">Precio por boleto:</label>
+            <input type="number" id="precio" name="precio" step="0.01" required>
+
+            <label for="cliente">Nombre del cliente:</label>
+            <input type="text" id="cliente" name="cliente" required>
+
+            <label for="edad">Edad del cliente:</label>
+            <input type="number" id="edad" name="edad" min="0" required>
+
+            <label for="fecha">Fecha de venta:</label>
+            <input type="date" id="fecha" name="fecha" required>
+
+            <label for="iva">IVA (%):</label>
+            <input type="number" id="iva" name="iva" value="15" readonly>
+
+            <button type="button" id="calcular">Calcular Total</button>
+        </form>
+
+        <section id="resultado">
+            <h2>Detalle de la Reserva</h2>
+            <p id="total"></p>
+        </section>
+    </main>
+
+    <script>
+        const peliculas = {
+            terror: [
+                { id: "Terror1", nombre: "THE PRODIGY", imagen: "img/Terror1.jpg" },
+                { id: "Terror2", nombre: "LA OUIJA", imagen: "img/Terror2.jpg" }
+            ],
+            accion: [
+                { id: "Accion1", nombre: "VENOM EL ÚLTIMO BAILE", imagen: "img/Accion1.jpg" },
+                { id: "Accion2", nombre: "AVENGERS ENDGAME", imagen: "img/Accion2.jpg" }
+            ],
+            comedia: [
+                { id: "Comedia1", nombre: "NO SE ACEPTAN DEVOLUCIONES", imagen: "img/Comedia1.jpg" },
+                { id: "Comedia2", nombre: "Y DÓNDE ESTÁN LAS RUBIAS", imagen: "img/Comedia2.jpg" }
+            ],
+            romance: [
+                { id: "Romance1", nombre: "ANTES DE TÍ", imagen: "img/Romance1.jpg" },
+                { id: "Romance2", nombre: "TITANIC", imagen: "img/Romance2.jpg" }
+            ]
+        };
+
+        const categoriaSelect = document.getElementById("categoria");
+        const peliculaSelect = document.getElementById("pelicula");
+        const imagenSeleccionada = document.getElementById("imagenSeleccionada");
+
+        categoriaSelect.addEventListener("change", () => {
+            const categoria = categoriaSelect.value;
+            peliculaSelect.innerHTML = "<option value=''>Selecciona una película</option>";
+
+            if (categoria && peliculas[categoria]) {
+                peliculas[categoria].forEach(pelicula => {
+                    const option = document.createElement("option");
+                    option.value = pelicula.id;
+                    option.textContent = pelicula.nombre;
+                    peliculaSelect.appendChild(option);
+                });
+            }
+
+            imagenSeleccionada.src = "";
+            imagenSeleccionada.alt = "Imagen de la película";
+        });
+
+        peliculaSelect.addEventListener("change", () => {
+            const categoria = categoriaSelect.value;
+            const peliculaId = peliculaSelect.value;
+
+            if (categoria && peliculas[categoria]) {
+                const pelicula = peliculas[categoria].find(p => p.id === peliculaId);
+
+                if (pelicula) {
+                    imagenSeleccionada.src = pelicula.imagen;
+                    imagenSeleccionada.alt = `Imagen de la película ${pelicula.nombre}`;
+                }
+            }
+        });
+
+        document.getElementById("calcular").addEventListener("click", function() {
+            const cantidad = parseInt(document.getElementById("cantidad").value);
+            const precio = parseFloat(document.getElementById("precio").value);
+            const edad = parseInt(document.getElementById("edad").value);
+            const fecha = new Date(document.getElementById("fecha").value);
+            const iva = parseFloat(document.getElementById("iva").value) / 100;
+
+            if (isNaN(cantidad) || isNaN(precio) || cantidad <= 0 || precio <= 0) {
+                document.getElementById("total").textContent = "Por favor, ingrese valores válidos para cantidad y precio.";
+                return;
+            }
+
+            let subtotal = cantidad * precio;
+            let descuento = 0;
+            let recargo = 0;
+
+            
+            if (cantidad > 3) {
+                descuento += subtotal * 0.15;
+            }
+
+            
+            if (edad > 65) {
+                descuento += subtotal * 0.50;
+            }
+
+           
+            if (fecha.getDay() === 1 || fecha.getDay() === 2) {
+                descuento += Math.floor(cantidad / 2) * precio;
+            }
+
+            
+            if ([4, 5, 6].includes(fecha.getDay())) {
+                recargo += subtotal * 0.05;
+            }
+
+            let total = subtotal - descuento + recargo;
+            total += total * iva; 
+
+            document.getElementById("total").textContent = `Total a pagar: $${total.toFixed(2)}`;
+        });
+    </script>
+</body>
+<footer>
+    <p>&copy; 2025 SALAS CINE</p>
+</footer>
+</html>
+
